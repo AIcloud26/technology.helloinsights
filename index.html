@@ -49,12 +49,12 @@
                 <span class="header-badge">Technology</span>
             </a>
             <nav class="tech-nav" id="mainNav">
-                <a href="/ai/">AI</a>
-                <a href="/software/">Software</a>
-                <a href="/cybersecurity/">Cybersecurity</a>
-                <a href="/gadgets/">Gadgets</a>
-                <a href="/developer/">Developer</a>
-                <a href="/future-tech/">Future Tech</a>
+                <a href="index.html?cat=ai">AI</a>
+                <a href="index.html?cat=software">Software</a>
+                <a href="index.html?cat=cybersecurity">Cybersecurity</a>
+                <a href="index.html?cat=gadgets">Gadgets</a>
+                <a href="index.html?cat=developer">Developer</a>
+                <a href="index.html?cat=future-tech">Future Tech</a>
             </nav>
             <div class="header-actions">
                 <button class="search-toggle" id="searchToggle" aria-label="Search">
@@ -172,12 +172,28 @@
     (function() {
         'use strict';
         var allArticles = [];
+        var filteredArticles = [];
         var usedIds = {};
         var latestShown = 0;
         var latestPerBatch = 8;
+        var currentCat = '';
+
+        // Read category from URL
+        var params = new URLSearchParams(window.location.search);
+        currentCat = params.get('cat') || '';
 
         function markUsed(id) { usedIds[id] = true; }
         function isUsed(id) { return !!usedIds[id]; }
+
+        // Highlight active nav link
+        if (currentCat) {
+            var navLinks = document.querySelectorAll('#mainNav a');
+            navLinks.forEach(function(link) {
+                if (link.getAttribute('href') === 'index.html?cat=' + currentCat) {
+                    link.classList.add('active');
+                }
+            });
+        }
 
         // Load data
         var jsonFile = (typeof SITE_CONFIG !== 'undefined') ? SITE_CONFIG.jsonFile : 'technology-index.json';
@@ -186,10 +202,48 @@
             .then(function(data) {
                 allArticles = data.articles || [];
                 allArticles.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+
+                // Filter by category if specified
+                if (currentCat) {
+                    filteredArticles = allArticles.filter(function(a) { return a.subcategory === currentCat; });
+                    // Update page title and hero for category view
+                    var catInfo = null;
+                    if (typeof SITE_CONFIG !== 'undefined') {
+                        SITE_CONFIG.subcategories.forEach(function(sub) {
+                            if (sub.id === currentCat) catInfo = sub;
+                        });
+                    }
+                    if (catInfo) {
+                        document.title = catInfo.name + ' - HelloInsights Technology';
+                        var metaDesc = document.querySelector('meta[name="description"]');
+                        if (metaDesc) metaDesc.setAttribute('content', catInfo.desc);
+                        // Update hero
+                        var heroH1 = document.querySelector('.tech-hero h1');
+                        var heroP = document.querySelector('.tech-hero p');
+                        var heroCta = document.querySelector('.hero-cta');
+                        if (heroH1) heroH1.innerHTML = catInfo.name;
+                        if (heroP) heroP.textContent = catInfo.desc;
+                        if (heroCta) { heroCta.textContent = 'Browse ' + catInfo.name; heroCta.href = '#latest'; }
+                        // Update section titles
+                        var latestTitle = document.querySelector('.latest-section .section-title');
+                        if (latestTitle) latestTitle.textContent = 'Latest ' + catInfo.name;
+                        var featuredTitle = document.querySelector('.featured-section .section-title');
+                        if (featuredTitle) featuredTitle.textContent = 'Featured ' + catInfo.name;
+                    }
+                } else {
+                    filteredArticles = allArticles;
+                }
+
                 renderEditorial();
                 renderFeatured();
                 renderLatest(true);
-                renderCategorySections();
+                if (!currentCat) {
+                    renderCategorySections();
+                } else {
+                    // In category view, hide the multi-category sections
+                    var catSections = document.getElementById('categorySections');
+                    if (catSections) catSections.style.display = 'none';
+                }
                 renderMostRead();
                 renderFooterTopics();
                 initSearch();
@@ -204,18 +258,18 @@
             }
         }
 
-        // Featured (top 4 unused)
+        // Featured (top 4 unused from filtered set)
         function renderFeatured() {
             var grid = document.getElementById('featuredGrid');
-            var featured = allArticles.filter(function(a) { return a.featured; });
-            if (featured.length === 0) featured = allArticles.slice(0, 4);
+            var featured = filteredArticles.filter(function(a) { return a.featured; });
+            if (featured.length === 0) featured = filteredArticles.slice(0, 4);
             var html = '';
             featured.forEach(function(art, i) {
                 markUsed(art.id);
                 var imgUrl = art.image || SITE_CONFIG.fallbackImage;
                 var cls = i === 0 ? 'featured-main' : 'featured-side';
                 html += '<article class="featured-card ' + cls + '">' +
-                    '<a href="/article.html?id=' + encodeURIComponent(art.id) + '">' +
+                    '<a href="article.html?id=' + encodeURIComponent(art.id) + '">' +
                     '<img src="' + imgUrl + '" alt="' + esc(art.title) + '" loading="lazy" decoding="async" width="640" height="360">' +
                     '<span class="featured-cat">' + esc(art.category) + '</span>' +
                     '<h3>' + esc(art.title) + '</h3>' +
@@ -226,12 +280,12 @@
             grid.innerHTML = html;
         }
 
-        // Latest
+        // Latest (from filtered set, excluding already used)
         function renderLatest(reset) {
             var list = document.getElementById('latestList');
             var btn = document.getElementById('loadMoreBtn');
             if (reset) { latestShown = 0; list.innerHTML = ''; }
-            var remaining = allArticles.filter(function(a) { return !isUsed(a.id); });
+            var remaining = filteredArticles.filter(function(a) { return !isUsed(a.id); });
             var batch = remaining.slice(latestShown, latestShown + latestPerBatch);
             if (batch.length === 0) { btn.style.display = 'none'; return; }
             var html = '';
@@ -240,12 +294,12 @@
                 latestShown++;
                 var imgUrl = art.image || SITE_CONFIG.fallbackImage;
                 html += '<article class="latest-card">' +
-                    '<a href="/article.html?id=' + encodeURIComponent(art.id) + '" class="latest-img">' +
+                    '<a href="article.html?id=' + encodeURIComponent(art.id) + '" class="latest-img">' +
                     '<img src="' + imgUrl + '" alt="' + esc(art.title) + '" loading="lazy" decoding="async" width="480" height="270">' +
                     '</a>' +
                     '<div class="latest-body">' +
                     '<span class="latest-cat">' + esc(art.category) + '</span>' +
-                    '<h3><a href="/article.html?id=' + encodeURIComponent(art.id) + '">' + esc(art.title) + '</a></h3>' +
+                    '<h3><a href="article.html?id=' + encodeURIComponent(art.id) + '">' + esc(art.title) + '</a></h3>' +
                     '<p>' + esc(art.excerpt || '') + '</p>' +
                     '<time>' + fmtDate(art.date) + '</time>' +
                     '</div></article>';
@@ -254,7 +308,14 @@
             btn.style.display = remaining.length > latestShown ? '' : 'none';
         }
 
-        document.getElementById('loadMoreBtn').addEventListener('click', function() { renderLatest(false); });
+        document.getElementById('loadMoreBtn').addEventListener('click', function() {
+            renderLatest(false);
+            // Scroll to top of the latest section
+            var latestSection = document.getElementById('latest');
+            if (latestSection) {
+                latestSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
 
         // Category Sections
         function renderCategorySections() {
@@ -263,14 +324,14 @@
             SITE_CONFIG.subcategories.forEach(function(sub) {
                 var arts = allArticles.filter(function(a) { return a.subcategory === sub.id; }).slice(0, 3);
                 if (arts.length === 0) return;
-                var url = SITE_CONFIG.categoryUrlMap[sub.id] || '/' + sub.id + '/';
+                var url = SITE_CONFIG.categoryUrlMap[sub.id] || 'index.html?cat=' + sub.id;
                 html += '<section class="topic-section"><div class="container">' +
                     '<div class="topic-header"><h2>' + esc(sub.name) + '</h2><a href="' + url + '" class="view-all">View all &rarr;</a></div>' +
                     '<div class="topic-grid">';
                 arts.forEach(function(art) {
                     var imgUrl = art.image || SITE_CONFIG.fallbackImage;
                     html += '<article class="topic-card">' +
-                        '<a href="/article.html?id=' + encodeURIComponent(art.id) + '">' +
+                        '<a href="article.html?id=' + encodeURIComponent(art.id) + '">' +
                         '<img src="' + imgUrl + '" alt="' + esc(art.title) + '" loading="lazy" decoding="async" width="480" height="270">' +
                         '<h3>' + esc(art.title) + '</h3>' +
                         '<time>' + fmtDate(art.date) + '</time>' +
@@ -284,10 +345,10 @@
         // Most Read (5 articles, pure text)
         function renderMostRead() {
             var list = document.getElementById('mostReadList');
-            var items = allArticles.slice(0, 5);
+            var items = filteredArticles.slice(0, 5);
             var html = '';
             items.forEach(function(art, i) {
-                html += '<li><a href="/article.html?id=' + encodeURIComponent(art.id) + '">' +
+                html += '<li><a href="article.html?id=' + encodeURIComponent(art.id) + '">' +
                     '<span class="mr-num">' + (i + 1) + '</span>' +
                     '<span class="mr-text">' + esc(art.title) + '</span>' +
                     '</a></li>';
@@ -300,7 +361,7 @@
             var ul = document.getElementById('footerTopics');
             var html = '';
             SITE_CONFIG.subcategories.forEach(function(sub) {
-                var url = SITE_CONFIG.categoryUrlMap[sub.id] || '/' + sub.id + '/';
+                var url = SITE_CONFIG.categoryUrlMap[sub.id] || 'index.html?cat=' + sub.id;
                 html += '<li><a href="' + url + '">' + esc(sub.name) + '</a></li>';
             });
             ul.innerHTML = html;
@@ -320,7 +381,7 @@
                     if (!q) return;
                     var results = allArticles.filter(function(a) { return a.title.toLowerCase().indexOf(q) !== -1; });
                     if (results.length > 0) {
-                        window.location.href = '/article.html?id=' + encodeURIComponent(results[0].id);
+                        window.location.href = 'article.html?id=' + encodeURIComponent(results[0].id);
                     } else {
                         alert('No articles found for: ' + input.value);
                     }

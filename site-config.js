@@ -28,11 +28,11 @@ var SITE_CONFIG = {
     ],
     // URL mappings
     categoryUrlMap: {
-        'ai': '/ai/',
-        'software': '/software/',
-        'cybersecurity': '/cybersecurity/',
-        'gadgets': '/gadgets/',
-        'developer': '/developer/',
-        'future-tech': '/future-tech/'
+        'ai': 'index.html?cat=ai',
+        'software': 'index.html?cat=software',
+        'cybersecurity': 'index.html?cat=cybersecurity',
+        'gadgets': 'index.html?cat=gadgets',
+        'developer': 'index.html?cat=developer',
+        'future-tech': 'index.html?cat=future-tech'
     }
 };
