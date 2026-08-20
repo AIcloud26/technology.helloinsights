@@ -282,7 +282,7 @@
             related.forEach(function(r) {
                 var imgUrl = r.image || SITE_CONFIG.fallbackImage;
                 html += '<article class="related-card">' +
-                    '<a href="/article.html?id=' + encodeURIComponent(r.id) + '">' +
+                    '<a href="article.html?id=' + encodeURIComponent(r.id) + '">' +
                     '<img src="' + imgUrl + '" alt="' + esc(r.title) + '" loading="lazy" decoding="async" width="480" height="270">' +
                     '<h3>' + esc(r.title) + '</h3>' +
                     '<time>' + fmtDate(r.date) + '</time>' +
@@ -295,7 +295,7 @@
             var pills = document.getElementById('topicsPills');
             var html = '';
             SITE_CONFIG.subcategories.forEach(function(sub) {
-                var url = SITE_CONFIG.categoryUrlMap[sub.id] || '/' + sub.id + '/';
+                var url = SITE_CONFIG.categoryUrlMap[sub.id] || 'index.html?cat=' + sub.id;
                 var isCurrent = sub.id === art.subcategory;
                 html += '<a href="' + url + '" class="topic-pill' + (isCurrent ? ' current' : '') + '">' + esc(sub.name) + '</a>';
             });
@@ -306,7 +306,7 @@
             var ul = document.getElementById('footerTopics');
             var html = '';
             SITE_CONFIG.subcategories.forEach(function(sub) {
-                var url = SITE_CONFIG.categoryUrlMap[sub.id] || '/' + sub.id + '/';
+                var url = SITE_CONFIG.categoryUrlMap[sub.id] || 'index.html?cat=' + sub.id;
                 html += '<li><a href="' + url + '">' + esc(sub.name) + '</a></li>';
             });
             ul.innerHTML = html;
