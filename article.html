@@ -35,11 +35,11 @@
     <header class="tech-header" id="siteHeader">
         <div class="header-inner">
             <a href="/" class="tech-logo">
-                <svg viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg" width="160" height="32">
-                    <rect x="2" y="6" width="28" height="28" rx="6" fill="#ff6b35"/>
-                    <text x="7" y="27" font-size="16" font-weight="900" fill="#fff" font-family="monospace">{"}"}</text>
-                    <text x="38" y="28" font-size="20" font-weight="800" fill="#1a1a2e" font-family="-apple-system, sans-serif">Hello</text>
-                    <text x="96" y="28" font-size="20" font-weight="800" fill="#ff6b35" font-family="-apple-system, sans-serif">Insights</text>
+                <svg viewBox="0 0 220 44" xmlns="http://www.w3.org/2000/svg" width="185" height="37">
+                    <rect x="2" y="6" width="32" height="32" rx="7" fill="#ff6b35"/>
+                    <text x="8" y="29" font-size="17" font-weight="900" fill="#fff" font-family="monospace">{"}"}</text>
+                    <text x="42" y="31" font-size="22" font-weight="800" fill="#1a1a2e" font-family="Georgia, serif">Hello</text>
+                    <text x="107" y="31" font-size="22" font-weight="800" fill="#ff6b35" font-family="Georgia, serif">Insights</text>
                 </svg>
                 <span class="header-badge">Technology</span>
             </a>
@@ -52,6 +52,12 @@
                 <a href="index.html?cat=future-tech">Future Tech</a>
             </nav>
             <div class="header-actions">
+                <div class="header-search">
+                    <input type="text" id="searchInput" placeholder="Search articles..." aria-label="Search articles">
+                    <button id="searchBtn" aria-label="Search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    </button>
+                </div>
                 <button class="menu-toggle" id="menuToggle" aria-label="Menu">
                     <span></span><span></span><span></span>
                 </button>
@@ -59,28 +65,31 @@
         </div>
     </header>
 
-    <!-- Breadcrumb -->
-    <nav class="tech-breadcrumb" id="breadcrumb">
-        <a href="/">Technology</a> &rsaquo;
-        <a href="#" id="breadcrumbCat">Category</a> &rsaquo;
-        <span id="breadcrumbTitle">Article</span>
-    </nav>
+    <!-- Article Hero Image (constrained width) -->
+    <div class="article-hero-wrap">
+        <img id="articleHeroImg" src="" alt="" loading="eager" fetchpriority="high" width="800" height="450">
+    </div>
 
-    <!-- Article Hero -->
+    <!-- Article -->
     <article class="tech-article">
-        <div class="article-hero-wrap">
-            <img id="articleHeroImg" src="" alt="" loading="eager" fetchpriority="high" width="1200" height="675">
-        </div>
         <div class="article-content-wrap">
-            <div class="article-meta-top">
+            <!-- Breadcrumb -->
+            <nav class="article-meta-top">
                 <a href="#" class="article-cat-link" id="articleCatLink">Category</a>
                 <time id="articleDate" datetime=""></time>
-            </div>
+            </nav>
+
             <h1 id="articleTitle" class="article-h1"></h1>
             <p class="article-lead" id="articleLead"></p>
 
             <!-- Ad: article-banner-top -->
             <div class="ad-slot" id="ad-article-banner-top" data-ad-slot="article-banner-top"></div>
+
+            <!-- Editor Note (optional, for original commentary) -->
+            <div class="editor-note" id="editorNote" style="display:none">
+                <span class="ed-label">Editor's Note</span>
+                <div id="editorNoteContent"></div>
+            </div>
 
             <!-- Article Content -->
             <div class="article-body" id="articleBody"></div>
@@ -129,15 +138,25 @@
                 <ul id="footerTopics"></ul>
             </div>
             <div class="footer-col">
-                <h4>More</h4>
+                <h4>Network</h4>
                 <ul>
-                    <li><a href="https://helloinsights.online" target="_blank">HelloInsights Main</a></li>
-                    <li><a href="https://finance.helloinsights.online" target="_blank">Finance</a></li>
+                    <li><a href="https://helloinsights.online" target="_blank" rel="noopener">HelloInsights Main</a></li>
+                    <li><a href="https://finance.helloinsights.online" target="_blank" rel="noopener">Finance</a></li>
+                    <li><a href="https://health.helloinsights.online" target="_blank" rel="noopener">Health</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
             <p>&copy; 2025 HelloInsights. All rights reserved.</p>
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
         </div>
     </footer>
 
@@ -155,44 +174,49 @@
         var allArticles = [];
         var jsonFile = (typeof SITE_CONFIG !== 'undefined') ? SITE_CONFIG.jsonFile : 'technology-index.json';
         var fullJsonFile = (typeof SITE_CONFIG !== 'undefined') ? SITE_CONFIG.fullArticleJson : 'articles-technology.json';
+        var opinionFile = 'opinions.json';
         var base = 'https://technology.helloinsights.online';
 
-        // Load index first, then full article data
         Promise.all([
             fetch(jsonFile, {cache:'no-cache'}).then(function(r){return r.json();}),
-            fetch(fullJsonFile, {cache:'no-cache'}).then(function(r){return r.json();}).catch(function(){return null;})
+            fetch(fullJsonFile, {cache:'no-cache'}).then(function(r){return r.json();}).catch(function(){return null;}),
+            fetch(opinionFile, {cache:'no-cache'}).then(function(r){return r.json();}).catch(function(){return null;})
         ]).then(function(results) {
             var indexData = results[0];
             var fullData = results[1];
+            var opinionData = results[2];
             allArticles = indexData.articles || [];
 
-            // Find article in index
             var article = allArticles.find(function(a) { return String(a.id) === String(articleId); });
-
             if (!article) { window.location.href = '/'; return; }
 
-            // Try to get full content from articles JSON
             var content = '';
             if (fullData && fullData.articles) {
                 var full = fullData.articles.find(function(a) { return String(a.id) === String(articleId); });
                 if (full) content = full.content || '';
             }
 
-            // Render
-            renderArticle(article, content);
+            // Check for editor opinion/notes
+            var opinion = null;
+            if (opinionData && opinionData.articles) {
+                opinion = opinionData.articles.find(function(a) { return String(a.id) === String(articleId); });
+            }
+
+            renderArticle(article, content, opinion);
             renderRelated(article);
             renderExploreTopics(article);
             renderFooter();
+            initSearch();
         }).catch(function(err) {
             console.error('Load error:', err);
         });
 
-        function renderArticle(art, content) {
+        function renderArticle(art, content, opinion) {
+            // Hero image — use moderate size (800w), not full width
             var imgUrl = art.image || SITE_CONFIG.fallbackImage;
-            // Fix image size for hero
-            imgUrl = imgUrl.replace(/w=\d+/, 'w=1200').replace(/h=\d+/, 'h=675');
+            imgUrl = imgUrl.replace(/w=\d+/, 'w=800').replace(/h=\d+/, 'h=450');
 
-            var catUrl = SITE_CONFIG.categoryUrlMap[art.subcategory] || '/';
+            var catUrl = SITE_CONFIG.categoryUrlMap[art.subcategory] || 'index.html';
             var catName = art.category || '';
             var articleUrl = base + '/article.html?id=' + encodeURIComponent(art.id);
 
@@ -209,7 +233,7 @@
             document.getElementById('twTitle').setAttribute('content', titleText);
             document.getElementById('twDesc').setAttribute('content', descText);
 
-            // JSON-LD Article
+            // JSON-LD
             var jsonld = {
                 "@context": "https://schema.org",
                 "@type": "Article",
@@ -218,33 +242,23 @@
                 "image": imgUrl,
                 "description": descText,
                 "author": { "@type": "Organization", "name": "HelloInsights" },
-                "publisher": { "@type": "Organization", "name": "HelloInsights Technology", "logo": { "@type": "ImageObject", "url": base + "/style.css" } },
+                "publisher": { "@type": "Organization", "name": "HelloInsights Technology" },
                 "mainEntityOfPage": { "@type": "WebPage", "@id": articleUrl }
             };
             document.getElementById('jsonldArticle').textContent = JSON.stringify(jsonld);
 
-            // Breadcrumb JSON-LD
             var bcl = {
                 "@context": "https://schema.org",
                 "@type": "BreadcrumbList",
                 "itemListElement": [
                     { "@type": "ListItem", "position": 1, "name": "Technology", "item": base + "/" },
-                    { "@type": "ListItem", "position": 2, "name": catName, "item": base + catUrl },
+                    { "@type": "ListItem", "position": 2, "name": catName, "item": base + "/" + catUrl },
                     { "@type": "ListItem", "position": 3, "name": art.title, "item": articleUrl }
                 ]
             };
             document.getElementById('jsonldBreadcrumb').textContent = JSON.stringify(bcl);
 
-            // Breadcrumb nav
-            document.getElementById('breadcrumbCat').textContent = catName;
-            document.getElementById('breadcrumbCat').href = catUrl;
-            document.getElementById('breadcrumbTitle').textContent = art.title;
-
-            // Article elements
-            var heroImg = document.getElementById('articleHeroImg');
-            heroImg.src = imgUrl;
-            heroImg.alt = art.title;
-
+            // Render
             document.getElementById('articleCatLink').textContent = catName;
             document.getElementById('articleCatLink').href = catUrl;
             document.getElementById('articleDate').textContent = fmtDate(art.date);
@@ -252,14 +266,33 @@
             document.getElementById('articleTitle').textContent = art.title;
             document.getElementById('articleLead').textContent = art.excerpt || '';
 
-            // Body content
+            var heroImg = document.getElementById('articleHeroImg');
+            heroImg.src = imgUrl;
+            heroImg.alt = art.title;
+
+            // Editor note / opinion
+            if (opinion && opinion.note) {
+                var noteEl = document.getElementById('editorNote');
+                var noteContent = document.getElementById('editorNoteContent');
+                noteContent.innerHTML = opinion.note;
+                noteEl.style.display = '';
+            }
+
+            // Body
             if (content) {
                 document.getElementById('articleBody').innerHTML = content;
             } else {
                 document.getElementById('articleBody').innerHTML = '<p>' + esc(art.excerpt || art.title) + '</p>';
             }
 
-            // Share buttons
+            // If opinion has additional paragraphs, append after body
+            if (opinion && opinion.additionalContent) {
+                var extraDiv = document.createElement('div');
+                extraDiv.innerHTML = '<h2>Our Take</h2>' + opinion.additionalContent;
+                document.getElementById('articleBody').appendChild(extraDiv);
+            }
+
+            // Share
             var encodedUrl = encodeURIComponent(articleUrl);
             var encodedTitle = encodeURIComponent(art.title);
             document.getElementById('shareTwitter').href = 'https://twitter.com/intent/tweet?url=' + encodedUrl + '&text=' + encodedTitle;
@@ -271,16 +304,14 @@
             var related = allArticles.filter(function(a) {
                 return a.subcategory === art.subcategory && a.id !== art.id;
             }).slice(0, 3);
-
             if (related.length === 0) {
-                // Fallback: any other articles
                 related = allArticles.filter(function(a) { return a.id !== art.id; }).slice(0, 3);
             }
-
             var grid = document.getElementById('relatedGrid');
             var html = '';
             related.forEach(function(r) {
                 var imgUrl = r.image || SITE_CONFIG.fallbackImage;
+                imgUrl = imgUrl.replace(/w=\d+/, 'w=480').replace(/h=\d+/, 'h=270');
                 html += '<article class="related-card">' +
                     '<a href="article.html?id=' + encodeURIComponent(r.id) + '">' +
                     '<img src="' + imgUrl + '" alt="' + esc(r.title) + '" loading="lazy" decoding="async" width="480" height="270">' +
@@ -312,7 +343,28 @@
             ul.innerHTML = html;
         }
 
-        // Mobile menu
+        function initSearch() {
+            var input = document.getElementById('searchInput');
+            var btn = document.getElementById('searchBtn');
+            function doSearch() {
+                var q = input.value.toLowerCase().trim();
+                if (!q) return;
+                var results = allArticles.filter(function(a) {
+                    return a.title.toLowerCase().indexOf(q) !== -1;
+                });
+                if (results.length > 0) {
+                    window.location.href = 'article.html?id=' + encodeURIComponent(results[0].id);
+                } else {
+                    input.value = '';
+                    input.placeholder = 'No results found';
+                }
+            }
+            if (btn) btn.addEventListener('click', doSearch);
+            if (input) input.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') doSearch();
+            });
+        }
+
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.getElementById('mainNav').classList.toggle('nav-open');
         });

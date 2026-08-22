@@ -40,11 +40,11 @@
     <header class="tech-header" id="siteHeader">
         <div class="header-inner">
             <a href="/" class="tech-logo">
-                <svg viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg" width="160" height="32">
-                    <rect x="2" y="6" width="28" height="28" rx="6" fill="#ff6b35"/>
-                    <text x="7" y="27" font-size="16" font-weight="900" fill="#fff" font-family="monospace">{"}"}</text>
-                    <text x="38" y="28" font-size="20" font-weight="800" fill="#1a1a2e" font-family="-apple-system, sans-serif">Hello</text>
-                    <text x="96" y="28" font-size="20" font-weight="800" fill="#ff6b35" font-family="-apple-system, sans-serif">Insights</text>
+                <svg viewBox="0 0 220 44" xmlns="http://www.w3.org/2000/svg" width="185" height="37">
+                    <rect x="2" y="6" width="32" height="32" rx="7" fill="#ff6b35"/>
+                    <text x="8" y="29" font-size="17" font-weight="900" fill="#fff" font-family="monospace">{"}"}</text>
+                    <text x="42" y="31" font-size="22" font-weight="800" fill="#1a1a2e" font-family="Georgia, serif">Hello</text>
+                    <text x="107" y="31" font-size="22" font-weight="800" fill="#ff6b35" font-family="Georgia, serif">Insights</text>
                 </svg>
                 <span class="header-badge">Technology</span>
             </a>
@@ -57,26 +57,25 @@
                 <a href="index.html?cat=future-tech">Future Tech</a>
             </nav>
             <div class="header-actions">
-                <button class="search-toggle" id="searchToggle" aria-label="Search">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                </button>
+                <div class="header-search">
+                    <input type="text" id="searchInput" placeholder="Search articles..." aria-label="Search articles">
+                    <button id="searchBtn" aria-label="Search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    </button>
+                </div>
                 <button class="menu-toggle" id="menuToggle" aria-label="Menu">
                     <span></span><span></span><span></span>
                 </button>
             </div>
-        </div>
-        <div class="search-bar" id="searchBar" style="display:none">
-            <input type="text" id="searchInput" placeholder="Search Technology articles..." aria-label="Search">
-            <button id="searchClose" aria-label="Close search">&times;</button>
         </div>
     </header>
 
     <!-- ===== HERO ===== -->
     <section class="tech-hero">
         <div class="hero-content">
-            <h1>Technology Insights<br>for the Digital World</h1>
-            <p>Explore the latest breakthroughs in AI, software, cybersecurity, and digital innovation.</p>
-            <a href="#latest" class="hero-cta">Explore Technology Topics</a>
+            <h1 id="heroTitle">Technology Insights<br>for the Digital World</h1>
+            <p id="heroDesc">Explore the latest breakthroughs in AI, software, cybersecurity, and digital innovation.</p>
+            <a href="#latest" class="hero-cta" id="heroCta">Explore Technology Topics</a>
         </div>
         <div class="hero-grid-bg"></div>
     </section>
@@ -92,7 +91,7 @@
     <!-- ===== FEATURED STORIES ===== -->
     <section class="featured-section">
         <div class="container">
-            <h2 class="section-title">Featured Technology Stories</h2>
+            <h2 class="section-title" id="featuredTitle">Featured Technology Stories</h2>
             <div class="featured-grid" id="featuredGrid"></div>
         </div>
     </section>
@@ -103,7 +102,7 @@
     <!-- ===== LATEST TECHNOLOGY ===== -->
     <section class="latest-section" id="latest">
         <div class="container">
-            <h2 class="section-title">Latest Technology</h2>
+            <h2 class="section-title" id="latestTitle">Latest Technology</h2>
             <div class="latest-list" id="latestList"></div>
             <button class="load-more-btn" id="loadMoreBtn" style="display:none">Load More Stories</button>
         </div>
@@ -145,22 +144,33 @@
         <div class="footer-inner">
             <div class="footer-brand">
                 <strong>HelloInsights Technology</strong>
-                <p>Editorial-grade technology coverage for the digital world.</p>
+                <p>Editorial-grade technology coverage for the digital world. We analyze what matters, who it affects, and where it's heading.</p>
             </div>
             <div class="footer-col">
                 <h4>Topics</h4>
                 <ul id="footerTopics"></ul>
             </div>
             <div class="footer-col">
-                <h4>More</h4>
+                <h4>Network</h4>
                 <ul>
-                    <li><a href="https://helloinsights.online" target="_blank">HelloInsights Main</a></li>
-                    <li><a href="https://finance.helloinsights.online" target="_blank">Finance</a></li>
+                    <li><a href="https://helloinsights.online" target="_blank" rel="noopener">HelloInsights Main</a></li>
+                    <li><a href="https://finance.helloinsights.online" target="_blank" rel="noopener">Finance</a></li>
+                    <li><a href="https://health.helloinsights.online" target="_blank" rel="noopener">Health</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="about.html#contact">Contact</a></li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
             <p>&copy; 2025 HelloInsights. All rights reserved.</p>
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
         </div>
     </footer>
 
@@ -178,14 +188,12 @@
         var latestPerBatch = 8;
         var currentCat = '';
 
-        // Read category from URL
         var params = new URLSearchParams(window.location.search);
         currentCat = params.get('cat') || '';
 
         function markUsed(id) { usedIds[id] = true; }
         function isUsed(id) { return !!usedIds[id]; }
 
-        // Highlight active nav link
         if (currentCat) {
             var navLinks = document.querySelectorAll('#mainNav a');
             navLinks.forEach(function(link) {
@@ -195,7 +203,6 @@
             });
         }
 
-        // Load data
         var jsonFile = (typeof SITE_CONFIG !== 'undefined') ? SITE_CONFIG.jsonFile : 'technology-index.json';
         fetch(jsonFile, { cache: 'no-cache' })
             .then(function(r) { return r.json(); })
@@ -203,10 +210,8 @@
                 allArticles = data.articles || [];
                 allArticles.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
 
-                // Filter by category if specified
                 if (currentCat) {
                     filteredArticles = allArticles.filter(function(a) { return a.subcategory === currentCat; });
-                    // Update page title and hero for category view
                     var catInfo = null;
                     if (typeof SITE_CONFIG !== 'undefined') {
                         SITE_CONFIG.subcategories.forEach(function(sub) {
@@ -217,17 +222,15 @@
                         document.title = catInfo.name + ' - HelloInsights Technology';
                         var metaDesc = document.querySelector('meta[name="description"]');
                         if (metaDesc) metaDesc.setAttribute('content', catInfo.desc);
-                        // Update hero
-                        var heroH1 = document.querySelector('.tech-hero h1');
-                        var heroP = document.querySelector('.tech-hero p');
-                        var heroCta = document.querySelector('.hero-cta');
-                        if (heroH1) heroH1.innerHTML = catInfo.name;
-                        if (heroP) heroP.textContent = catInfo.desc;
+                        var heroTitle = document.getElementById('heroTitle');
+                        var heroDesc = document.getElementById('heroDesc');
+                        var heroCta = document.getElementById('heroCta');
+                        if (heroTitle) heroTitle.textContent = catInfo.name;
+                        if (heroDesc) heroDesc.textContent = catInfo.desc;
                         if (heroCta) { heroCta.textContent = 'Browse ' + catInfo.name; heroCta.href = '#latest'; }
-                        // Update section titles
-                        var latestTitle = document.querySelector('.latest-section .section-title');
+                        var latestTitle = document.getElementById('latestTitle');
                         if (latestTitle) latestTitle.textContent = 'Latest ' + catInfo.name;
-                        var featuredTitle = document.querySelector('.featured-section .section-title');
+                        var featuredTitle = document.getElementById('featuredTitle');
                         if (featuredTitle) featuredTitle.textContent = 'Featured ' + catInfo.name;
                     }
                 } else {
@@ -240,7 +243,6 @@
                 if (!currentCat) {
                     renderCategorySections();
                 } else {
-                    // In category view, hide the multi-category sections
                     var catSections = document.getElementById('categorySections');
                     if (catSections) catSections.style.display = 'none';
                 }
@@ -250,7 +252,6 @@
             })
             .catch(function(err) { console.error('Failed to load index:', err); });
 
-        // Editorial
         function renderEditorial() {
             var el = document.getElementById('editorialText');
             if (typeof SITE_CONFIG !== 'undefined') {
@@ -258,7 +259,6 @@
             }
         }
 
-        // Featured (top 4 unused from filtered set)
         function renderFeatured() {
             var grid = document.getElementById('featuredGrid');
             var featured = filteredArticles.filter(function(a) { return a.featured; });
@@ -267,6 +267,7 @@
             featured.forEach(function(art, i) {
                 markUsed(art.id);
                 var imgUrl = art.image || SITE_CONFIG.fallbackImage;
+                imgUrl = imgUrl.replace(/w=\d+/, 'w=800').replace(/h=\d+/, 'h=450');
                 var cls = i === 0 ? 'featured-main' : 'featured-side';
                 html += '<article class="featured-card ' + cls + '">' +
                     '<a href="article.html?id=' + encodeURIComponent(art.id) + '">' +
@@ -280,7 +281,6 @@
             grid.innerHTML = html;
         }
 
-        // Latest (from filtered set, excluding already used)
         function renderLatest(reset) {
             var list = document.getElementById('latestList');
             var btn = document.getElementById('loadMoreBtn');
@@ -293,11 +293,12 @@
                 markUsed(art.id);
                 latestShown++;
                 var imgUrl = art.image || SITE_CONFIG.fallbackImage;
+                imgUrl = imgUrl.replace(/w=\d+/, 'w=400').replace(/h=\d+/, 'h=280');
                 html += '<article class="latest-card">' +
                     '<a href="article.html?id=' + encodeURIComponent(art.id) + '" class="latest-img">' +
-                    '<img src="' + imgUrl + '" alt="' + esc(art.title) + '" loading="lazy" decoding="async" width="480" height="270">' +
+                    '<img src="' + imgUrl + '" alt="' + esc(art.title) + '" loading="lazy" decoding="async" width="400" height="280">' +
                     '</a>' +
-                    '<div class="latest-body">' +
+                    '<div class="latest-card-body">' +
                     '<span class="latest-cat">' + esc(art.category) + '</span>' +
                     '<h3><a href="article.html?id=' + encodeURIComponent(art.id) + '">' + esc(art.title) + '</a></h3>' +
                     '<p>' + esc(art.excerpt || '') + '</p>' +
@@ -310,14 +311,12 @@
 
         document.getElementById('loadMoreBtn').addEventListener('click', function() {
             renderLatest(false);
-            // Scroll to top of the latest section
             var latestSection = document.getElementById('latest');
             if (latestSection) {
                 latestSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
 
-        // Category Sections
         function renderCategorySections() {
             var container = document.getElementById('categorySections');
             var html = '';
@@ -330,6 +329,7 @@
                     '<div class="topic-grid">';
                 arts.forEach(function(art) {
                     var imgUrl = art.image || SITE_CONFIG.fallbackImage;
+                    imgUrl = imgUrl.replace(/w=\d+/, 'w=480').replace(/h=\d+/, 'h=270');
                     html += '<article class="topic-card">' +
                         '<a href="article.html?id=' + encodeURIComponent(art.id) + '">' +
                         '<img src="' + imgUrl + '" alt="' + esc(art.title) + '" loading="lazy" decoding="async" width="480" height="270">' +
@@ -342,21 +342,18 @@
             container.innerHTML = html;
         }
 
-        // Most Read (5 articles, pure text)
         function renderMostRead() {
             var list = document.getElementById('mostReadList');
             var items = filteredArticles.slice(0, 5);
             var html = '';
             items.forEach(function(art, i) {
                 html += '<li><a href="article.html?id=' + encodeURIComponent(art.id) + '">' +
-                    '<span class="mr-num">' + (i + 1) + '</span>' +
                     '<span class="mr-text">' + esc(art.title) + '</span>' +
                     '</a></li>';
             });
             list.innerHTML = html;
         }
 
-        // Footer
         function renderFooterTopics() {
             var ul = document.getElementById('footerTopics');
             var html = '';
@@ -367,34 +364,33 @@
             ul.innerHTML = html;
         }
 
-        // Search
         function initSearch() {
-            var toggle = document.getElementById('searchToggle');
-            var bar = document.getElementById('searchBar');
             var input = document.getElementById('searchInput');
-            var close = document.getElementById('searchClose');
-            toggle.addEventListener('click', function() { bar.style.display = bar.style.display === 'none' ? '' : 'none'; input.focus(); });
-            close.addEventListener('click', function() { bar.style.display = 'none'; });
-            input.addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') {
-                    var q = input.value.toLowerCase().trim();
-                    if (!q) return;
-                    var results = allArticles.filter(function(a) { return a.title.toLowerCase().indexOf(q) !== -1; });
-                    if (results.length > 0) {
-                        window.location.href = 'article.html?id=' + encodeURIComponent(results[0].id);
-                    } else {
-                        alert('No articles found for: ' + input.value);
-                    }
+            var btn = document.getElementById('searchBtn');
+            function doSearch() {
+                var q = input.value.toLowerCase().trim();
+                if (!q) return;
+                var results = allArticles.filter(function(a) {
+                    return a.title.toLowerCase().indexOf(q) !== -1 ||
+                           (a.excerpt && a.excerpt.toLowerCase().indexOf(q) !== -1);
+                });
+                if (results.length > 0) {
+                    window.location.href = 'article.html?id=' + encodeURIComponent(results[0].id);
+                } else {
+                    input.placeholder = 'No results for "' + input.value + '"';
+                    input.value = '';
                 }
+            }
+            btn.addEventListener('click', doSearch);
+            input.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') doSearch();
             });
         }
 
-        // Mobile menu
         document.getElementById('menuToggle').addEventListener('click', function() {
             document.getElementById('mainNav').classList.toggle('nav-open');
         });
 
-        // Utils
         function fmtDate(d) { try { return new Date(d).toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'}); } catch(e) { return d; } }
         function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.appendChild(document.createTextNode(s)); return d.innerHTML; }
     })();
